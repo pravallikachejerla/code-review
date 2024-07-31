@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Question Details</title>
+    <style>
+       
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        #request-code-review {
+            display: inline-block;
+            margin: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            color: #fff;
+            background-color: #007BFF;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        #request-code-review:hover {
+            background-color: #0056b3;
+        }
+
+        #code-review-modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+            z-index: 1000;
+        }
+
+        #code-review-modal h2 {
+            margin-top: 0;
+        }
+
+        #notification-message {
+            width: 100%;
+            height: 100px;
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            resize: none;
+        }
+
+        #send-notification, #cancel-notification {
+            display: inline-block;
+            padding: 10px 20px;
+            font-size: 14px;
+            color: #fff;
+            background-color: #28a745;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-right: 10px;
+        }
+
+        #cancel-notification {
+            background-color: #dc3545;
+        }
+
+        #send-notification:hover {
+            background-color: #218838;
+        }
+
+        #cancel-notification:hover {
+            background-color: #c82333;
+        }
+
+        #overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 500;
+        }
+    </style>
+</head>
+<body>
+   
+    <button id="request-code-review">Request Code Review</button>
+
+    
+    <div id="overlay"></div>
+    <div id="code-review-modal">
+        <h2>Request Code Review</h2>
+        <textarea id="notification-message" placeholder="Enter your message..."></textarea>
+        <button id="send-notification">Send Notification</button>
+        <button id="cancel-notification">Cancel</button>
+    </div>
+
+    <script>
+       
+        document.addEventListener('DOMContentLoaded', function() {
+            const requestCodeReviewButton = document.getElementById('request-code-review');
+            const codeReviewModal = document.getElementById('code-review-modal');
+            const notificationMessageInput = document.getElementById('notification-message');
+            const sendNotificationButton = document.getElementById('send-notification');
+            const cancelNotificationButton = document.getElementById('cancel-notification');
+            const overlay = document.getElementById('overlay');
+
+            
+            requestCodeReviewButton.addEventListener('click', function() {
+                codeReviewModal.style.display = 'block'; 
+                overlay.style.display = 'block'; 
+            });
+
+            
+            cancelNotificationButton.addEventListener('click', function() {
+                codeReviewModal.style.display = 'none'; 
+                overlay.style.display = 'none'; 
+            });
+
+            
+            sendNotificationButton.addEventListener('click', function() {
+                const notificationMessage = notificationMessageInput.value.trim();
+                if (notificationMessage) {
+                    
+                    fetch('/send-notification', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ message: notificationMessage })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert('Notification successfully sent!');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error sending notification:', error);
+                    });
+
+                    
+                    codeReviewModal.style.display = 'none';
+                    overlay.style.display = 'none';
+                    
+                    notificationMessageInput.value = '';
+                } else {
+                    alert('Please enter a message');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+
